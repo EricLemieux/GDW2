@@ -42,6 +42,9 @@ void Game::initializeGame()
 	gamePhase = true;
 	//selectmove is false
 	selectMove = false;
+	resetActionList();
+	isWaiting=false;
+	timePassed = 0;
 	actionsTaken = 0;
 
 
@@ -218,13 +221,30 @@ void Game::drawTestPrimitives()
 */
 void Game::update()
 {
+
 	// update our clock so we have the delta time since the last update
 	updateTimer->tick();
 
 	/* you should probably update all of the sprites in a list just like the drawing */
 	/* maybe two lists, one for physics updates and another for sprite animation frame update */
 	testSprite->nextFrame();
-	
+	//if waiting then check to see how much time is passed, once enough time set isWaiting to false
+	if(isWaiting){
+		timePassed = updateTimer->getElapsedTimeSeconds() + timePassed;
+		if(timePassed>3)
+			isWaiting = false;
+	//if execution phase then execute actions and increment counter
+	}else if(!gamePhase){
+		//hardcoded to wait
+		Execute(actionlist[actionsTaken]);
+		actionsTaken++;
+	}
+	//once all actions taken, flip gamephase reset actions taken and actions in list
+	if(actionsTaken == 6){
+		actionsTaken = 0;
+		gamePhase = !gamePhase;
+		resetActionList();
+	}
 
 //	bg->update();
 }
@@ -256,9 +276,8 @@ void Game::keyboardDown(unsigned char key, int mouseX, int mouseY)
 	switch(key)
 	{
 	case 32: // the space bar
-		//if(gamePhase)
-		//	gamePhase = !gamePhase;
-		gamePhase = !gamePhase;
+		if(gamePhase)
+			gamePhase = !gamePhase;
 		break;
 	case 27: // the escape key
 	case 'q': // the 'q' key
@@ -343,4 +362,29 @@ void Game::mouseMoved(int x, int y)
 			testSprite->setPosition(input.currentX,input.currentY);
 		}
 	}
+}
+
+
+//execute actions in order
+void Game::Execute(int i){
+	
+	switch (i){
+	case 0:
+		isWaiting = action.Wait();
+		break;
+	case 1:
+		//move
+		break;
+	case 2:
+		//capture
+		break;
+	case 3:
+		//attack
+		break;
+	case 4:
+		//defend
+		break;
+	default:
+		action.Wait();
+	}	
 }

@@ -1,42 +1,20 @@
 #include "ActionList.h"
 
-ActionList::ActionList(void)
-{
-	executionOrder = 0;
-}
 
-void ActionList::Wait()
-{
-	//TODO
-	executionOrder++;
-}
 
-void ActionList::Move(int currentX, int currentY)
-{
-	//TODO
-	executionOrder++;
+//constructor, possibly turn this into a singleton later
+ActionList::ActionList(){
 }
-void ActionList::Capture(int currentX, int currentY, int cityState)
-{
-	//TODO
-	executionOrder++;
+//destructor
+ActionList::~ActionList(){}
+
+
+//index numbers 0-4 these are the actual actions
+bool ActionList::Wait(){
+	return true;
 }
-void ActionList::Attack(int currentX, int currentY)
-{
-	//TODO
-	executionOrder++;
-}
-void ActionList::Defend(int currentX, int currenty)
-{
-	//TODO
-	executionOrder++;
-}
-	
-void ActionList::Execute()
-{
-	while(executionOrder > 0)
-	{
-		//TODO
-		executionOrder--;
-	}
-}
+void Move(int currentX, int currentY){}
+void Capture(int currentX, int currentY, int cityState){}
+void Attack(int currentX, int currentY){}
+void Defend(int currentX, int currenty){}
+

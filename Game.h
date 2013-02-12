@@ -132,6 +132,21 @@ public:
 	void mouseClicked(int button, int state, int x, int y);
 	void mouseMoved(int x, int y);
 
+	/*execute action list*/
+	void Execute(int i);
+	void resetActionList(){
+		for(int i = 0; i < 6; i++){
+			actionlist[i] = 0;
+		}
+	}
+	//add an action to the list
+	void addAction(int turn, int actionIndex){	
+		actionlist[turn] = actionIndex;
+	}
+	//remove action from list
+	void removeAction(int index){	
+	}
+
 	/*********************************/
 	/* DATA */
 	/*********************************/
@@ -140,12 +155,18 @@ public:
 	GameStateInfo stateInfo;
 	//order phase = true and execution phase = false
 	bool gamePhase;
+	//if true, game is on standby
+	bool isWaiting;
+	//tracking time passed
+	float timePassed;
 	//if true and gamephase is true then player 
 	//can click on map to select location to move to
 	bool selectMove;
-	//number of actions taken, gamePhase switches out
-	//of combat when it reaches 0;
+	//action list, keeps track of selected moves and executes when ready.
+	ActionList action;
+	int actionlist[6];
 	int actionsTaken;
+
 
 	/* individual sprites to manipulate by name */
 	Sprite *testSprite;
@@ -167,4 +188,5 @@ public:
 	/* timer's for rendering and animation/physics update */
 	Timer *renderingTimer;
 	Timer *updateTimer; // for physics/collisions etc.
+
 };
