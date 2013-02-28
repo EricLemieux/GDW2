@@ -13,10 +13,10 @@
 /******************************************/
 /* GLOBAL VARIABLES */
 /******************************************/
-#define WINDOW_SCREEN_WIDTH 640
-#define WINDOW_SCREEN_HEIGHT 432
+#define WINDOW_SCREEN_WIDTH 800
+#define WINDOW_SCREEN_HEIGHT 600
 #define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 432
+#define WINDOW_HEIGHT 600
 
 /*********************************/
 /* GLOBAL SPRITE INFO */

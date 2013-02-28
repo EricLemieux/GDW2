@@ -45,26 +45,55 @@ void Game::initializeGame()
 	resetActionList();
 	isWaiting=false;
 	timePassed = 0;
-	actionsTaken = 0;
+	actionsTaken = 5;
 
+	//button 2
+	B2 = new Sprite("images/B2.png");
+	B2->setNumberOfAnimations(1);
+	B2->setSpriteFrameSize(142,57);
+	B2->setPosition(636,600-75);
+	B2->setLayerID(3);
+	B2->addSpriteAnimFrame(0,0,0);
 
-	/* now let's create a sprite that has multiple rows in the sheet */
-	/* here, I'm assuming they are all equally spaced on X, and Y */
-	testSprite = new Sprite("images/p_Dance.png");
-	int numRows = 8;
-	testSprite->setNumberOfAnimations(numRows);
-	testSprite->setSpriteFrameSize(110,128);
-	testSprite->setPosition(400,200);
-	testSprite->setLayerID(2);
+	this->addSpriteToDrawList(B2);
 
-	/* set up the pixel xy locations of each row */
-	for(int i=0;i<numRows;i++)
-	{
-		float step = 110*i;
-		testSprite->addSpriteAnimRow(i, 0,step, 128,0,numRows);
-	}
-	testSprite->setCurrentAnimation(0);
-	this->addSpriteToDrawList(testSprite);
+	//menu background
+	UI = new Sprite("images/BASIC_UI.png");
+	UI->setNumberOfAnimations(1);
+	UI->setSpriteFrameSize(800,600);
+	UI->setPosition(0,0);
+	UI->setLayerID(1);
+	UI->addSpriteAnimFrame(0,0,0);
+
+	this->addSpriteToDrawList(UI);
+
+	//player sprite
+	mainchar = new Sprite("images/charactersprite.png");
+	mainchar->setNumberOfAnimations(1);
+	mainchar->setSpriteFrameSize(24,24);
+	mainchar->setPosition(200,500);
+	mainchar->setLayerID(2);
+	mainchar->addSpriteAnimFrame(0,0,0);
+
+	//enemy sprite
+	badchar = new Sprite("images/charactersprite2.png");
+	badchar->setNumberOfAnimations(1);
+	badchar->setSpriteFrameSize(24,24);
+	badchar->setPosition(240,540);
+	badchar->setLayerID(2);
+	badchar->addSpriteAnimFrame(0,0,0);
+
+	this->addSpriteToDrawList(mainchar);
+	this->addSpriteToDrawList(badchar);
+	//background
+	bg2 = new Sprite("images/UI-concept1.bmp");
+	bg2->setNumberOfAnimations(1);
+	bg2->setSpriteFrameSize(616,455);
+	bg2->setPosition(0,600-455);
+	bg2->setLayerID(1);
+	bg2->addSpriteAnimFrame(0,0,0);
+
+	this->addSpriteToDrawList(bg2);
 
 
 }
@@ -123,16 +152,16 @@ void Game::DrawGame()
 	
 	if(gamePhase){
 		setColor(1,1,0);
-		drawRectangle(true, 0,0,50,50,45.f);
+		drawRectangle(true, 0,700,50,50,45.f);
 		setColor(0.5,1,0.5);
 		drawTriangle(true, 100,0,200,200,300,100);
 	} else {
 		setColor(1,0,1);
-		drawRectangle(true, 0,0,50,50,45.f);
+		drawRectangle(true, 0,700,50,50,45.f);
 		setColor(0.5,0,0.5);
 		drawTriangle(true, 100,0,200,200,300,100);
 	}
-
+	
 	/* this makes it actually show up on the screen */
 	glutSwapBuffers();
 }
@@ -163,14 +192,6 @@ void Game::drawSprites()
 	   but that would be silly since we have a list of sprites to draw
 	   stored, so all we need to do is go through the list and draw eaach 
 	   sprite in the list */
-	/* // silly way 
-	testSprite->draw();
-	animatedSprite->draw();
-	animatedSprite2->draw();
-	*/
-	
-	/* better way */
-	/* this is better because it doesn't matter how many sprites we have, they will always be drawn */
 	std::vector<Sprite*>::iterator it; 
 	for(it=spriteListToDraw.begin(); it != spriteListToDraw.end();it++)
 	{
@@ -182,30 +203,31 @@ void Game::drawSprites()
 
 /* for testing purposes to show you how to use
    the drawing primitives capabilities */
+
 void Game::drawTestPrimitives()
 {
-	/* draw line */
+	
 	setLineWidth(5.f);
 	setColor(1,0,0);
 	drawLine(100,100,200,200);
 	setLineWidth(1.f);
 
-	/* draw rectangle */
+	
 	setColor(1,1,0);
 	drawRectangle(true, 200,200,50,50,45.f);
 
-	/* draw circle */
+	
 	setLineWidth(5.f);
 	setColor(0,1,1);
 	drawCircle(20, 50, 200,200);
 	drawFilledCircle(20,50,500,200);
 	setLineWidth(1.f);
 	 
-	/* draw triangle */
+	
 	setColor(0.5,0,0.5);
 	drawTriangle(true, 100,100,200,200,300,100);
 
-	/* draw text */
+	
 	setColor(1,1,1);
 	drawText("HELLO WORLD",200,200);
 }
@@ -227,21 +249,26 @@ void Game::update()
 
 	/* you should probably update all of the sprites in a list just like the drawing */
 	/* maybe two lists, one for physics updates and another for sprite animation frame update */
-	testSprite->nextFrame();
-	//if waiting then check to see how much time is passed, once enough time set isWaiting to false
-	if(isWaiting){
-		timePassed = updateTimer->getElapsedTimeSeconds() + timePassed;
-		if(timePassed>3)
-			isWaiting = false;
+	UI->update();
+	bg2->nextFrame();
+	mainchar->update();
+	badchar->update();
+	
+	//if no space for actions left and in order phase
+	if(gamePhase && (actionsTaken < 0)){
+		gamePhase = !gamePhase;
+		actionsTaken = 0;
+	}
+
 	//if execution phase then execute actions and increment counter
-	}else if(!gamePhase){
+	if(!gamePhase){
 		//hardcoded to wait
 		Execute(actionlist[actionsTaken]);
-		actionsTaken++;
+		
 	}
-	//once all actions taken, flip gamephase reset actions taken and actions in list
-	if(actionsTaken == 6){
-		actionsTaken = 0;
+
+	//once all actions taken, flip gamephase and reset actions in list
+	if((actionsTaken == 5)&&(!gamePhase)){
 		gamePhase = !gamePhase;
 		resetActionList();
 	}
@@ -320,11 +347,12 @@ void Game::mouseClicked(int button, int state, int x, int y)
 		switch(button)
 		{
 		case GLUT_LEFT_BUTTON:
-			//testSprite->setPosition(input.clickX,input.clickY);
-			if(input.currentX > 0 && input.currentX < 50 && input.currentY > 0 && input.currentY < 50 && !gamePhase){
-				gamePhase = !gamePhase;
-			}else if(input.currentX > 100 && input.currentX < 150 && input.currentY > 0 && input.currentY < 50 && gamePhase) {
-				//move stuff
+			//if you click b2 during order phase, flicker button and add wait to actionlist
+ 			if ((input.clickX >=676)&&(input.clickX <= 787)){
+				if((input.clickY <= stateInfo.windowHeight-16)&&(input.clickY >= stateInfo.windowHeight-72)&&gamePhase){
+					B2->setLayerID(0);
+					actionsTaken = addAction(actionsTaken,0);
+				}
 			}
 			break;
 		case GLUT_RIGHT_BUTTON:
@@ -337,6 +365,7 @@ void Game::mouseClicked(int button, int state, int x, int y)
 	else
 	{
 		input.mouseDown = false;
+		B2->setLayerID(3);
 	}
 
 }
@@ -359,7 +388,7 @@ void Game::mouseMoved(int x, int y)
 	{
 		if(input.button == GLUT_LEFT_BUTTON)
 		{
-			testSprite->setPosition(input.currentX,input.currentY);
+			
 		}
 	}
 }
@@ -370,7 +399,11 @@ void Game::Execute(int i){
 	
 	switch (i){
 	case 0:
-		isWaiting = action.Wait();
+		timePassed += updateTimer->getElapsedTimeSeconds();
+		if(timePassed>2){
+			timePassed = 0;
+			actionsTaken++;
+		}
 		break;
 	case 1:
 		//move
@@ -385,6 +418,10 @@ void Game::Execute(int i){
 		//defend
 		break;
 	default:
-		action.Wait();
+		timePassed += updateTimer->getElapsedTimeSeconds();
+		if(timePassed>2){
+			timePassed = 0;
+			actionsTaken++;
+		}
 	}	
 }

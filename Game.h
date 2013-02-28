@@ -139,9 +139,10 @@ public:
 			actionlist[i] = 0;
 		}
 	}
-	//add an action to the list
-	void addAction(int turn, int actionIndex){	
+	//add an action to the list, decrement space counter
+	int addAction(int turn, int actionIndex){	
 		actionlist[turn] = actionIndex;
+		return --turn;
 	}
 	//remove action from list
 	void removeAction(int index){	
@@ -169,7 +170,10 @@ public:
 
 
 	/* individual sprites to manipulate by name */
-	Sprite *testSprite;
+	Sprite *UI;
+	Sprite *bg2;
+	Sprite *mainchar, *badchar;
+	Sprite *B2;
 
 	// the background scroller
 	//HorizontalScrollingBackground *bg;
