@@ -1,43 +1,30 @@
 //Map.h
-//This is the class for the map file, it is a triple-ly linked list for the nodes on the map.
+//This is the class for the map, for the GDW semster 2 game
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <fstream>
 
 #pragma once
 
-struct node
-{
-	short IDNumber;
-	/*node *connection1;
-	node *connection2;
-	node *connection3;
-	node *connection4;*/
-	node *connection[5];
-
-	//These are used to initialise the list
+struct node{
+	std::vector<node> connections;
+	int ID;
 	int data;
-	node *previous;
-	node *next;
 };
 
 class Map
 {
 public:
 	Map(void);
+	Map(std::string fileName);
 	~Map(void);
 
-	void add(short ID, short p1, short p2, short p3, short p4);
-	void add(int i);
+	std::vector<std::vector<int>> openFile(std::string fileName);
 
-	int size(void);
-	node* getConnections(void);
-
+	std::vector<std::vector<int>> total;
+	std::vector<std::vector<node>> connections;
 private:
-	node *headOfList;
-	node *tailOfList;
-	node *player1Pos;
-	node *player2Pos;
-	int sizeOfList;
-
-	//This is used only to initialise the list.
-	node *position;
 };
 

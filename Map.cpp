@@ -1,101 +1,98 @@
-//Map.cpp
-
 #include "Map.h"
-#include <iostream>
 
+//Constructor
 Map::Map(void)
 {
-	headOfList = tailOfList = NULL;
-	sizeOfList = 0;
+}
+Map::Map(std::string fileName)
+{
+	//Opens the file that is entered as an argument to the constructor.
+	std::fstream file;
+	file.open(fileName);
 
-	//loops throught the list initialising all of the list.
-	for(short n = 1; n<=21;n++)
+	//std::vector<std::vector<int>> total;
+
+	int count = 0;
+	int i = 0;
+
+	std::vector<std::vector<int>> numbers;
+	
+	std::vector<int> num;
+
+	//When the program is not done reading the file continue to read in the file.
+	while(!file.eof())
 	{
-		add(n);
-	}
+		
 
-	std::cout<<"New map list created.\n";
+		//short num;
+		
+		char stuff[256];
+		file>>stuff;
+		std::cout<<stuff<<std::endl;
+
+		if(strcmp(stuff,"NODE:")){
+			//num.push_back(atoi(stuff));
+			/////////numbers.at(i).push_back(atoi(stuff));	//TODO FIX THIS FUCKER!
+
+			num.push_back(atoi(stuff));
+			//numbers.push_back(num);
+			//numbers.at(0).push_back(2);
+
+			//numbers.at(0).push_back(1);	
+			//numbers.at(count).push_back(num);
+			//numbers.push_back(num);
+			if(!strcmp(stuff,";")){
+				//total.at(count).at(i).push_back(numbers);
+				total.push_back(num);
+				num.clear();
+				count++;
+			}
+			i++;
+		}
+	}
+	//this doesnt really do anything, I just needed it so i could put a breakpoint.
+	//TODO remove this thing.
+	std::cout<<"end\n";
 }
 
 Map::~Map(void)
 {
-	//TODO
 }
 
-void Map::add(short ID, short p1, short p2, short p3, short p4)
+//creates the vector using the file given.
+std::vector<std::vector<int>> Map::openFile(std::string fileName)
 {
-	short p[5];
-	p[1] = p1;
-	p[2] = p2;
-	p[3] = p3;
-	p[4] = p4;
+	//Opens the file that is entered as an argument to the constructor.
+	std::fstream file;
+	file.open(fileName);
 
-	position = headOfList;
-	node *temp = new node;
-	bool exit = false;
+	std::vector<std::vector<int>> total;
 
-	
+	int count = 0;
 
-	for(int count = 0; count<=4; count++)
+	//When the program is not done reading the file coninue to read in the file.
+	while(!file.eof())
 	{
-		exit = false;
-		while(!exit)
-		{
-			if(count == 0)
-			{
-				while(!exit)
-				{
-					if(position->IDNumber == ID)
-					{
-						temp = position;
-						exit = true;
-					}
-					position = position->next;
-				}
-			}
+		std::vector<int> numbers;
+		short num;
+		char stuff[256];
+		file>>stuff;
+		std::cout<<stuff<<std::endl;
 
-			if(count >0 && count <=4)
-			{
-				if(position->IDNumber == p[count])
-				{
-					temp->connection[count] = position;
-					exit = true;
-				}
-				else
-					position = position->next;
+		//gets the usefull numbers from the text file.
+		//So bacically the node number, the X and Y cordinents, and all of the conections that node has.
+		if(strcmp(stuff,"NODE:")){
+			num = atoi(stuff);
+			numbers.push_back(num);
+			if(strcmp(stuff,";")){
+				count++;
+				total.push_back(numbers);
 			}
 		}
 	}
+	//this doesnt really do anything, I just needed it so i could put a breakpoint.
+	//TODO remove this thing.
+	std::cout<<"end\n";
 
-	
-}
-
-void Map::add(int i)
-{
-	node *temp = new node;
-	temp->IDNumber = i;
-	temp->next = NULL;
-
-	if(headOfList==NULL)
-	{
-		headOfList = tailOfList = position = temp;
-	}
-	else
-	{
-		tailOfList->next = temp;
-		tailOfList = temp;
-		tailOfList->previous = position;
-		position = temp;
-	}
-	sizeOfList++;
-}
-
-int Map::size(void)
-{
-	return sizeOfList;
-}
-
-node* Map::getConnections(void)
-{
-	return headOfList;
+	return total;
 }
