@@ -21,10 +21,7 @@ public:
 	Map(std::string fileName);
 	~Map(void);
 
-	std::vector<std::vector<int>> openFile(std::string fileName);
-
 	std::vector<std::vector<int>> total;
-	std::vector<std::vector<node>> connections;
 private:
 };
 
