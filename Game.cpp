@@ -38,6 +38,15 @@ Game::~Game(void)
  */
 void Game::initializeGame()
 {
+	Map Map1("Maps\\MAP-0.txt");
+	//Initialize the game with level 0 before menu before level 1)
+	//currentLevel = 0;
+
+	//Initialize the player and enemy positions
+	playerCurrentPos = 0;
+	enemyCurrentPos  = 0;
+	targeter = false;
+	
 	//initial game phase is order
 	gamePhase = true;
 	//selectmove is false
@@ -47,17 +56,19 @@ void Game::initializeGame()
 	timePassed = 0;
 	actionsTaken = 5;
 
-	//button 2
-	B2 = new Sprite("images/B2.png");
-	B2->setNumberOfAnimations(1);
-	B2->setSpriteFrameSize(142,57);
-	B2->setPosition(636,600-75);
-	B2->setLayerID(3);
-	B2->addSpriteAnimFrame(0,0,0);
+	int ButtonX = 636;
+	int ButtonY = 70;
+	for(int i = 0; i < 5; i++){
+		B[i] = new Sprite("images/B2.png");  //This line, Need statement for each sprite, include outside for loop B[0], B[1] etc.
+		B[i]->setNumberOfAnimations(1);
+		B[i]->setSpriteFrameSize(142,57);
+		B[i]->setPosition(ButtonX ,stateInfo.windowHeight - (ButtonY + i*ButtonY));
+		B[i]->setLayerID(3);
+		B[i]->addSpriteAnimFrame(0,0,0);
+		this->addSpriteToDrawList(B[i]);
+	}
 
-	this->addSpriteToDrawList(B2);
 
-	//menu background
 	UI = new Sprite("images/BASIC_UI.png");
 	UI->setNumberOfAnimations(1);
 	UI->setSpriteFrameSize(800,600);
@@ -67,15 +78,30 @@ void Game::initializeGame()
 
 	this->addSpriteToDrawList(UI);
 
-	//player sprite
-	mainchar = new Sprite("images/charactersprite.png");
-	mainchar->setNumberOfAnimations(1);
-	mainchar->setSpriteFrameSize(24,24);
-	mainchar->setPosition(200,500);
-	mainchar->setLayerID(2);
-	mainchar->addSpriteAnimFrame(0,0,0);
+	mainchar = new Sprite("images/sprite.jpg");
+	mainchar->setNumberOfAnimations(18);
+	mainchar->setSpriteFrameSize(80,80);
+	mainchar->setPosition(200,200);
+	mainchar->setLayerID(3);
+	for(int i = 0; i < 1440; i+= 80){
+		mainchar->addSpriteAnimFrame(0,i,0);
+	}
+	mainchar->addSpriteAnimRow(1, 0,0,80, 0, 18);
+	mainchar->setCurrentAnimation(1);
+	this->addSpriteToDrawList(mainchar);
 
-	//enemy sprite
+	attack = new Sprite("images/Marc.png");
+	attack->setNumberOfAnimations(2);
+	attack->setSpriteFrameSize(60,60);
+	attack->setPosition(300,300);
+	attack->setLayerID(3);
+	for(int i = 240; i < 600; i+= 60){
+		mainchar->addSpriteAnimFrame(0,i,0);
+	}
+	attack->addSpriteAnimRow(1, 0,0,240, 0, 6);
+	attack->setCurrentAnimation(1);
+	this->addSpriteToDrawList(attack);
+
 	badchar = new Sprite("images/charactersprite2.png");
 	badchar->setNumberOfAnimations(1);
 	badchar->setSpriteFrameSize(24,24);
@@ -83,10 +109,10 @@ void Game::initializeGame()
 	badchar->setLayerID(2);
 	badchar->addSpriteAnimFrame(0,0,0);
 
-	this->addSpriteToDrawList(mainchar);
+	
 	this->addSpriteToDrawList(badchar);
-	//background
-	bg2 = new Sprite("images/UI-concept1.bmp");
+
+	bg2 = new Sprite("images/Level 1 concept.png");
 	bg2->setNumberOfAnimations(1);
 	bg2->setSpriteFrameSize(616,455);
 	bg2->setPosition(0,600-455);
@@ -160,6 +186,24 @@ void Game::DrawGame()
 		drawRectangle(true, 0,700,50,50,45.f);
 		setColor(0.5,0,0.5);
 		drawTriangle(true, 100,0,200,200,300,100);
+	}
+
+	if(targeter == true)
+	{
+		//replace this with a target sprite
+		setColor(1,0,0);
+		drawCircle(50,20,input.currentX,input.currentY);
+	}
+	
+	//testing using the nodes the user selects.
+	if(nodesSelected.size() != 0)
+	{
+		setColor(1,1,1);
+		//std::string a = std::to_string(nodesSelected.at(1));
+		//std::string a = std::to_string((long)42);
+		char buffer[50];
+		sprintf( buffer, "%d", nodesSelected.at(1) );
+		drawText(buffer,200,200);
 	}
 	
 	/* this makes it actually show up on the screen */
@@ -253,6 +297,11 @@ void Game::update()
 	bg2->nextFrame();
 	mainchar->update();
 	badchar->update();
+	attack->nextFrame();
+
+	for(int i = 0; i < 5; i++){
+		B[i]->update();
+	}
 	
 	//if no space for actions left and in order phase
 	if(gamePhase && (actionsTaken < 0)){
@@ -268,12 +317,14 @@ void Game::update()
 	}
 
 	//once all actions taken, flip gamephase and reset actions in list
-	if((actionsTaken == 5)&&(!gamePhase)){
+	if((actionsTaken == 6)&&(!gamePhase)){
 		gamePhase = !gamePhase;
 		resetActionList();
+	    bgm.playSound();
 	}
 
-//	bg->update();
+	
+
 }
 
 /* 
@@ -339,6 +390,8 @@ void Game::mouseClicked(int button, int state, int x, int y)
 {
 	if(state == GLUT_DOWN) 
 	{
+		int ButtonX1 = 636, ButtonX2 = 783;
+
 		input.mouseDown = true;
 		input.clickX = x*stateInfo.ratioWidth;
 		input.clickY = (stateInfo.windowHeight-y)*stateInfo.ratioHeight;
@@ -347,11 +400,24 @@ void Game::mouseClicked(int button, int state, int x, int y)
 		switch(button)
 		{
 		case GLUT_LEFT_BUTTON:
-			//if you click b2 during order phase, flicker button and add wait to actionlist
- 			if ((input.clickX >=676)&&(input.clickX <= 787)){
-				if((input.clickY <= stateInfo.windowHeight-16)&&(input.clickY >= stateInfo.windowHeight-72)&&gamePhase){
-					B2->setLayerID(0);
-					actionsTaken = addAction(actionsTaken,0);
+			//if you click a button during order phase, flicker button and add wait to actionlist
+			if(gamePhase){
+				if((input.clickX >=ButtonX1)&&(input.clickX <= ButtonX2)){
+					for(int i = 0; i < 5; i++){
+						int ButtonY1 = 16 + i*70, ButtonY2 = 70*(i+1);
+						if((input.clickY <= stateInfo.windowHeight-ButtonY1)&&(input.clickY >= stateInfo.windowHeight-ButtonY2)){
+							B[i]->setLayerID(0);
+							actionsTaken = addAction(actionsTaken,i);
+						}
+					}
+				}
+			
+			
+				if(targeter)
+				{
+				
+					nodesSelected = Map1.getNodes(input.clickX, input.clickY);
+					targeter = false;
 				}
 			}
 			break;
@@ -365,7 +431,9 @@ void Game::mouseClicked(int button, int state, int x, int y)
 	else
 	{
 		input.mouseDown = false;
-		B2->setLayerID(3);
+		for(int i = 0; i < 5; i++){
+			B[i]->setLayerID(3);
+		}
 	}
 
 }
@@ -393,6 +461,13 @@ void Game::mouseMoved(int x, int y)
 	}
 }
 
+//keeps track of the mouse when it is passive.
+//added by Eric
+void Game::passiveMouseMoved(int x, int y)
+{
+	input.currentX = x*stateInfo.ratioWidth;
+	input.currentY = (stateInfo.windowHeight-y)*stateInfo.ratioHeight;
+}
 
 //execute actions in order
 void Game::Execute(int i){
@@ -400,28 +475,58 @@ void Game::Execute(int i){
 	switch (i){
 	case 0:
 		timePassed += updateTimer->getElapsedTimeSeconds();
-		if(timePassed>2){
+		if(timePassed>1){
 			timePassed = 0;
 			actionsTaken++;
 		}
 		break;
 	case 1:
 		//move
+		if(Map1.canMove(playerCurrentPos,playerNewPos))
+		{
+			//Move the character using a 2d vector or something.
+			playerCurrentPos = playerNewPos;
+			actionsTaken++;
+		}
 		break;
 	case 2:
 		//capture
+		for(int count = 0; count < Map1.total.size() ; count++)
+		{
+			if(count == playerCurrentPos)
+			{
+				if(Map1.total.at(count).whoControls == 0)
+					Map1.total.at(count).whoControls = 1;
+			}
+			actionsTaken++;
+		}
 		break;
 	case 3:
 		//attack
+		targeter = true;
+		//TODO the attacking
+		actionsTaken++;
 		break;
 	case 4:
 		//defend
+		targeter = true;
+		//TODO the defending
+		actionsTaken++;
 		break;
 	default:
 		timePassed += updateTimer->getElapsedTimeSeconds();
-		if(timePassed>2){
+		if(timePassed>1){
 			timePassed = 0;
 			actionsTaken++;
 		}
 	}	
+}
+
+void Game::changeLevel(int newLevel)
+{
+	char load[32]="Maps\\MAP-0.txt";
+	load[9]=newLevel+48;
+	Map newMap(load);
+	currentLevel = newLevel;
+	Map1 = newMap;
 }

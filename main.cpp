@@ -124,6 +124,11 @@ void MouseMotionCallbackFunction(int x, int y)
 	glutPostRedisplay();
 }
 
+void MousePassiveCallbackFunction(int x, int y){
+	theGame->passiveMouseMoved(x,y);
+	glutPostRedisplay();
+}
+
 /* function main()
  * Description:
  *  - this is the main function
@@ -144,6 +149,7 @@ int main(int argc, char **argv)
 	glutReshapeFunc(WindowReshapeCallbackFunction);
 	glutMouseFunc(MouseClickCallbackFunction);
 	glutMotionFunc(MouseMotionCallbackFunction);
+	glutPassiveMotionFunc(MousePassiveCallbackFunction);
 	glutTimerFunc(1,TimerCallbackFunction,0);
 	
 	/* initialize the image library engine */

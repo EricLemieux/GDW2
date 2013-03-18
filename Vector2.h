@@ -16,7 +16,7 @@ public:
 		x = other.x;
 		y = other.y;
 	}
-	Vector2(float _vec[2])
+		Vector2(float _vec[2])
 	{
 		vec[0] = _vec[0];
 		vec[1] = _vec[1];

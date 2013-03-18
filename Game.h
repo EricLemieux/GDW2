@@ -7,6 +7,12 @@
 #include <iostream>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
+#include "AL/al.h"
+#include "AL/alc.h"
+#include "AL/alut.h"
 #include "GL/glut.h"
 #include "IL/il.h"
 #include "IL/ilu.h"
@@ -17,6 +23,10 @@
 #include "ActionList.h"
 #include <algorithm>
 #include <cmath>
+
+#include "Map.h"
+
+#include "Sound.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -131,6 +141,7 @@ public:
 	void keyboardUp(unsigned char key, int mouseX, int mouseY);
 	void mouseClicked(int button, int state, int x, int y);
 	void mouseMoved(int x, int y);
+	void passiveMouseMoved(int x, int y);
 
 	/*execute action list*/
 	void Execute(int i);
@@ -145,7 +156,8 @@ public:
 		return --turn;
 	}
 	//remove action from list
-	void removeAction(int index){	
+	void removeAction(int index){
+		actionlist[index] = 0;
 	}
 
 	/*********************************/
@@ -168,12 +180,14 @@ public:
 	int actionlist[6];
 	int actionsTaken;
 
+	Sound bgm;
 
 	/* individual sprites to manipulate by name */
 	Sprite *UI;
 	Sprite *bg2;
 	Sprite *mainchar, *badchar;
-	Sprite *B2;
+	Sprite *attack;
+	Sprite *B[7];
 
 	// the background scroller
 	//HorizontalScrollingBackground *bg;
@@ -193,4 +207,24 @@ public:
 	Timer *renderingTimer;
 	Timer *updateTimer; // for physics/collisions etc.
 
+	//stores the ID of the node the player is on as well of the the node the enemy is on.
+	short playerCurrentPos;
+	short enemyCurrentPos;
+
+	//The new position the player wants to move to.
+	short playerNewPos;
+
+	//the position the user is attacing
+	short posAttacking;
+
+	//The crosshair target thingey for when you are attacking and defending.
+	bool targeter;
+
+	//The nodes selected when the user is attacking or defending.
+	std::vector<int> nodesSelected;
+
+	//stores the current level information for the game.
+	Map Map1;
+	int currentLevel;
+	void changeLevel(int newLevel);
 };
